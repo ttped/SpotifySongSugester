@@ -12,7 +12,7 @@ class Song(DB.Model):
     duration_ms= DB.Column(DB.Integer, nullable=False)
     energy= DB.Column(DB.Integer, nullable=False)
     explicit= DB.Column(DB.Integer, nullable=False)
-    id= DB.Column(DB.String, nullable=False)
+    id= DB.Column(DB.String, nullable=False, primary_key=True)
     instrumental= DB.Column(DB.Integer, nullable=False)
     key= DB.Column(DB.Integer, nullable=False)
     liveness= DB.Column(DB.Integer, nullable=False)
@@ -23,4 +23,4 @@ class Song(DB.Model):
 
 
     def __repr__(self):
-        return "<User: {}>".format(self.name)
+        return "<Song: {}>".format(self.name)
