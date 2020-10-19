@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 
-
 DB = SQLAlchemy()
 
 class Song(DB.Model):
@@ -14,13 +13,11 @@ class Song(DB.Model):
     explicit= DB.Column(DB.Integer, nullable=False)
     id= DB.Column(DB.String, nullable=False, primary_key=True)
     instrumental= DB.Column(DB.Integer, nullable=False)
-    key= DB.Column(DB.Integer, nullable=False)
+    #key= DB.Column(DB.Integer, nullable=False)
     liveness= DB.Column(DB.Integer, nullable=False)
     loudness= DB.Column(DB.Integer, nullable=False)
-    mode = DB.Column(DB.Integer, nullable=False)
+    #mode = DB.Column(DB.Integer, nullable=False)
     name= DB.Column(DB.String, nullable=False)
-
-
 
     def __repr__(self):
         return "<Song: {}>".format(self.name)

@@ -1,14 +1,33 @@
 """ Main app/routing file for Spotify"""
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Markup
 from Spotify.models import Song, DB
 from os import getenv
 from Spotify import spotify_service
+import pandas as pd
 
 
 ## initalizing the app
 def create_app():
     """creates and configures flask application"""
+
+    labels = [
+    'JAN', 'FEB', 'MAR', 'APR',
+    'MAY', 'JUN', 'JUL', 'AUG',
+    'SEP', 'OCT', 'NOV', 'DEC'
+    ]
+
+
+    values = [
+        967.67, 1190.89, 1079.75, 1349.19,
+        2328.91, 2504.28, 2873.83, 4764.87,
+        4349.29, 6458.30, 9907, 16297
+    ]
+
+    colors = [
+        "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+        "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+        "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
 
     app = Flask(__name__)
     app.config['SQLAlCHEMY_DATABASE_URI'] = getenv('DATABASE_URI')
@@ -17,34 +36,29 @@ def create_app():
 
     @app.route('/')
     def root():
-    #return render_template("base.html", title="Home", users= User.query.all())
         return render_template("base.html", title="Home")
-## getting output for model
+
+    ## Send output for model
     @app.route('/song', methods=['POST'])
-    def song_suggestor(message=''):
-        songs = spotify_service.test_query("weezer")
-        return render_template("song.html", songs=songs)
+    def song_suggestor():
+        df = pd.read_csv('Spotify/data.csv')
+        df = df.drop(columns=['key', 'id', 'mode', 'year', 'release_date', 'artists',
+        'speechiness', 'tempo'])
+        df['duration_ms'] = df['duration_ms'] / 60000
+        bar_labels=df.columns
 
-    ## return song from Spotify/query
-    @app.route('/results', methods= ['GET'])
-    def results(name = None, message=''):
-        # either grab an user that already exist in our DB or grab the users input
-        name = name or request.values['user_name']
+        # The model output
+        df = df[df['name'] == request.values['song_name']]
 
-        try:
-            #if button is clicked then do this:
-            if request.method == 'POST':
-                add_or_update_user(name)
-                message = 'User {} sucessfully added!'.format(name)
-            tweets = User.query.filter(User.name == name).one().tweets
-        except Exception as e:
-            message = 'Error adding {}: {}'.format(name, e)
-            #if we get an error then no tweets are displayed
-            tweets=[]
+        # todo change request.values to model output values
+        api_songs = spotify_service.test_query(request.values['song_name'])
 
-        return render_template('user.html', title= name, tweets=tweets, message=message)
+        dummy_song_list = ['Chapter 3.4 - Zamek kaniowski', 'Rumours']
+        model_output = df[df['name'].isin(dummy_song_list)]
 
-
+        return render_template("song.html", songs=api_songs,
+        title='Bitcoin Monthly Price in USD', max=20, labels=bar_labels, values=df.values, df=df,
+        model_output=model_output)
 
     @app.route('/reset')
     def reset():
@@ -52,68 +66,6 @@ def create_app():
         DB.drop_all()
         #creates database again
         DB.create_all()
-        return render_template('base.html', titel='Home')
+        return render_template('base.html', title='Home')
 
     return app
-"""
-@app.route('/compare', methods=['POST'])
-    def compare(message=''):
-        #grabs inputted values from dropdown
-        user0, user1 = sorted ([request.values['user1'],
-            request.values['user2']])
-
-        if user0 == user1:
-            #tells application user they can't compre the same users
-            message = "Cannot compare users to themselves!"
-
-        else:
-           #running prediction and return the prediction to user as a message
-            prediction = predict_user(user0, user1, request.values['tweet_text'])
-            message = "{} is morely to be said by {} than {}".format(
-                request.values['tweet_text'], user1 if prediction else user0,
-                user0 if prediction else user1 )
-
-        return render_template( 'prediction.html', title ='Prediction', message = message)
-
-
-
-    @app.route('/user', methods=['POST'])
-    @app.route('/user/<name>', methods= ['GET'])
-    def user(name = None, message=''):
-        # either grab a user that already exist in our DB or grab the users input
-        name = name or request.values['user_name']
-
-        try:
-            #if button is clicked then do this:
-            if request.method == 'POST':
-                add_or_update_user(name)
-                message = 'User {} sucessfully added!'.format(name)
-            tweets = User.query.filter(User.name == name).one().tweets
-        except Exception as e:
-            message = 'Error adding {}: {}'.format(name, e)
-            #if we get an error then no tweets are displayed
-            tweets=[]
-
-        return render_template('user.html', title= name, tweets=tweets, message=message)
-
-
-
-
-    @app.route('/update')
-    def update():
-        #updates our users from the function in twitter.py
-        update_all_users()
-        return render_template('base.html',title = "Tweets have been updated", users=User.query.all())
-
-    @app.route('/reset')
-    def reset():
-        # resets datatbase
-        DB.drop_all()
-        #creates database again
-        DB.create_all()
-        return render_template('base.html', titel='Home')
-
-
-    return app
-
-"""
