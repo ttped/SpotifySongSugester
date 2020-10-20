@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, request, Markup
 from Spotify.models import Song, DB
+from Spotify import model_output
 from os import getenv
 from Spotify import spotify_service
 import pandas as pd
@@ -10,19 +11,6 @@ import pandas as pd
 ## initalizing the app
 def create_app():
     """creates and configures flask application"""
-
-    labels = [
-    'JAN', 'FEB', 'MAR', 'APR',
-    'MAY', 'JUN', 'JUL', 'AUG',
-    'SEP', 'OCT', 'NOV', 'DEC'
-    ]
-
-
-    values = [
-        967.67, 1190.89, 1079.75, 1349.19,
-        2328.91, 2504.28, 2873.83, 4764.87,
-        4349.29, 6458.30, 9907, 16297
-    ]
 
     colors = [
         "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
@@ -41,24 +29,25 @@ def create_app():
     ## Send output for model
     @app.route('/song', methods=['POST'])
     def song_suggestor():
-        df = pd.read_csv('Spotify/data.csv')
-        df = df.drop(columns=['key', 'id', 'mode', 'year', 'release_date', 'artists',
-        'speechiness', 'tempo'])
-        df['duration_ms'] = df['duration_ms'] / 60000
-        bar_labels=df.columns
+        df = model_output.return_model_output()
 
-        # The model output
-        df = df[df['name'] == request.values['song_name']]
+        original_song = model_output.get_user_input_song()
 
         # todo change request.values to model output values
         api_songs = spotify_service.test_query(request.values['song_name'])
 
-        dummy_song_list = ['Chapter 3.4 - Zamek kaniowski', 'Rumours']
-        model_output = df[df['name'].isin(dummy_song_list)]
+        df2 = df.drop(columns=['artists'])
+        ss1 = df2.iloc[0].values
 
         return render_template("song.html", songs=api_songs,
-        title='Bitcoin Monthly Price in USD', max=20, labels=bar_labels, values=df.values, df=df,
-        model_output=model_output)
+            title='Song Characteristics', max=40, labels=df2.columns,
+            model_output=df2,
+            original_song=original_song.values,
+            col1=ss1)
+
+    @app.route('/test')
+    def test():
+        return render_template('test.html')
 
     @app.route('/reset')
     def reset():
