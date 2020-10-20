@@ -37,8 +37,6 @@ def create_app():
         # todo change request.values to model output values
         api_songs = spotify_service.test_query(request.values['song_name'])
 
-        list_of_songs = model_output.seans_model(request.values['song_name'])
-
         df2 = df.drop(columns=['artists'])
         df2['popularity'] = df2['popularity'] / 100
         ss1 = df2.iloc[0].values
