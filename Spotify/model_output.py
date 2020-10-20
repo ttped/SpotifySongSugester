@@ -6,6 +6,7 @@ def return_model_output():
     'speechiness', 'tempo'])
 
     df['duration_ms'] = df['duration_ms'] / 60000
+    df['popularity'] = df['popularity'] / 100
 
     dummy_song_list = ['Bury Me Alive', 'you were good to me - shallou remix',
     'Glizzy', 'High Power', 'Wolves (with NAV)', 'All Around Me',
@@ -25,6 +26,7 @@ def get_user_input_song():
     'speechiness', 'tempo'])
 
     df['duration_ms'] = df['duration_ms'] / 60000
+    df['popularity'] = df['popularity'] / 10
 
     dummy_song_list = ['Rough Ryder']
 

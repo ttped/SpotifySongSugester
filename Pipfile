@@ -12,6 +12,7 @@ spotipy = "*"
 jinja2 = "*"
 python-dotenv = "*"
 pandas = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.8"

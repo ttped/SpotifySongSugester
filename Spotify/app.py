@@ -6,6 +6,7 @@ from Spotify import model_output
 from os import getenv
 from Spotify import spotify_service
 import pandas as pd
+import numpy as np
 
 
 ## initalizing the app
@@ -36,14 +37,26 @@ def create_app():
         # todo change request.values to model output values
         api_songs = spotify_service.test_query(request.values['song_name'])
 
+        list_of_songs = model_output.seans_model(request.values['song_name'])
+
         df2 = df.drop(columns=['artists'])
+        df2['popularity'] = df2['popularity'] / 100
         ss1 = df2.iloc[0].values
 
+        max = df2.drop(columns=['name']).max().max()
+        min = df2.drop(columns=['name']).min().min()
+
+        max = int(max) +1
+        min = int(min) -1
+
+        max = np.max([max, abs(min)])
+
         return render_template("song.html", songs=api_songs,
-            title='Song Characteristics', max=40, labels=df2.columns,
-            model_output=df2,
-            original_song=original_song.values,
-            col1=ss1)
+            title='Song Characteristics',
+            max=max, min=min,
+            labels=df2.columns,
+            model_output=df2.to_dict(orient='records'),
+            original_song=original_song.values)
 
     @app.route('/test')
     def test():

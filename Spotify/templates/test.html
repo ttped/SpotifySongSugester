@@ -1,0 +1,59 @@
+<canvas id="{{ loop.index }}2" width="600" height="400"></canvas>
+
+var ctx = document.getElementById("{{ loop.index }}").getContext("2d");
+var labels = [
+  {% for item in labels if item != "name" %}
+   "{{ item }}",
+  {% endfor %}
+  ]
+var data_orig = [
+{% for key in model_song if key != "name" %}
+   "{{ model_song[key] }}",
+{% endfor %}
+]
+}]
+var data_suggested = [
+{% for key in model_song if key != "name" %}
+   "{{ model_song[key] }}",
+{% endfor %}
+]
+}]
+
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Original Song",
+        fill: true,
+        backgroundColor: colors.purple.fill,
+        pointBackgroundColor: colors.purple.stroke,
+        borderColor: colors.purple.stroke,
+        pointHighlightStroke: colors.purple.stroke,
+        borderCapStyle: 'butt',
+        data: data_orig,
+
+      }, {
+        label: "Suggested Songs",
+        fill: true,
+        backgroundColor: colors.darkBlue.fill,
+        pointBackgroundColor: colors.darkBlue.stroke,
+        borderColor: colors.darkBlue.stroke,
+        pointHighlightStroke: colors.darkBlue.stroke,
+        borderCapStyle: 'butt',
+        data: data_suggested,
+      },
+    options: {
+      responsive: false,
+      // Can't just just `stacked: true` like the docs say
+      scales: {
+        yAxes: [{
+          stacked: true,
+        }]
+      },
+      animation: {
+        duration: 750,
+      },
+    }
+  });

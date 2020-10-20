@@ -16,99 +16,16 @@
       {% block content %}
       <div>
         <h1>Suggested Song</h1>
-        <!--
-        <canvas id="orig1" width="600" height="400"></canvas>
-        <script>
-          // bar chart data
-          var barData = {
-            labels : [
-              {% for item in labels %}
-               "{{ item }}",
-              {% endfor %}
-            ],
 
-            datasets : [{
-              fillColor: "rgba(151,187,205,0.2)",
-              strokeColor: "rgba(151,187,205,1)",
-              pointColor: "rgba(151,187,205,1)",
-              data : [
-                {% for item in orginal_song %}
-                   "{{ item }}",
-                  {% endfor %}
-              ]
-             }]
-          }
-
-
-           steps = 10
-           max = {{max}}
-
-         // draw bar chart
-         new Chart(document.getElementById("orig1").getContext("2d")).Line(barData, {
-           scaleOverride: true,
-           scaleSteps: steps,
-           scaleStepWidth: Math.ceil(max / steps),
-           scaleStartValue: -20,
-           scaleShowVerticalLines: true,
-           scaleShowGridLines : true,
-           barShowStroke : true,
-           scaleShowLabels: true
-           }
-         );
-
-        </script>
-        -->
-
-        <p> {{ col1 }}</p
-        <canvas id="chart1" width="600" height="400"></canvas>
-        <script>
-          // bar chart data
-          var barData = {
-            labels : [
-              {% for item in labels %}
-               "{{ item }}",
-              {% endfor %}
-            ],
-
-            datasets : [{
-              fillColor: "rgba(151,187,205,0.2)",
-              strokeColor: "rgba(151,187,205,1)",
-              pointColor: "rgba(151,187,205,1)",
-              data : [
-                {% for item in col1 %}
-                   "{{ item }}",
-                  {% endfor %}
-              ]
-             }]
-          }
-
-
-           steps = 10
-           max = {{max}}
-
-         // draw bar chart
-         new Chart(document.getElementById("chart1").getContext("2d")).Line(barData, {
-           scaleOverride: true,
-           scaleSteps: steps,
-           scaleStepWidth: Math.ceil(max / steps),
-           scaleStartValue: -20,
-           scaleShowVerticalLines: true,
-           scaleShowGridLines : true,
-           barShowStroke : true,
-           scaleShowLabels: true
-           }
-         );
-
-        </script>
-        <!--
        {% for model_song in model_output %}
-       <p>{{key}}: {{model_song.name}}</p>
+       <p>Song : {{model_song.name}}</p>
+
        <canvas id="{{ loop.index }}" width="600" height="400"></canvas>
        <script>
          // bar chart data
          var barData = {
            labels : [
-             {% for item in labels %}
+             {% for item in labels if item != "name" %}
               "{{ item }}",
              {% endfor %}
            ],
@@ -118,13 +35,12 @@
              strokeColor: "rgba(151,187,205,1)",
              pointColor: "rgba(151,187,205,1)",
              data : [
-               {% for item in values %}
-                  "{{ item }}",
-                 {% endfor %}
+             {% for key in model_song if key != "name" %}
+                "{{ model_song[key] }}",
+             {% endfor %}
              ]
             }]
          }
-
 
           steps = 10
           max = {{max}}
@@ -134,8 +50,8 @@
         new Chart(document.getElementById("{{ loop.index }}").getContext("2d")).Line(barData, {
           scaleOverride: true,
           scaleSteps: steps,
-          scaleStepWidth: Math.ceil(max / steps),
-          scaleStartValue: -10,
+          scaleStepWidth: Math.ceil(max / 10),
+          scaleStartValue: min,
           scaleShowVerticalLines: true,
           scaleShowGridLines : true,
           barShowStroke : true,
@@ -151,8 +67,6 @@
 
        </script>
        {% endfor %}
-       -->
-
 
         <h1>Spotify API Songs</h1>
         {% for song in songs %}
