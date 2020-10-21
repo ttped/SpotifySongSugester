@@ -15,8 +15,8 @@ nlp = spacy.load('en_core_web_sm')
 
 ### model training ###
 #STEP 1:
-from sklearn.decomposition import PCA
-def get_word_vectors(w):
+
+def get_word_vectors(song_name):
   #converts of words to their own vectors
   return [nlp(word).vector for word in w]
 
@@ -57,15 +57,14 @@ nn2.fit(last_vector)
 
 
 
-def model_step_1(user_input_song_name):
+def model_step_1(song_name):
 
-    user_song = s1_PCA_song_names.transform(get_word_vectors(user_input_song_name))
-    return f'your request matches the following songs, please choose the best match: {nn1.kneighbors(new)}'
+    user_song = s1_PCA_song_names.transform(get_word_vectors(song_name))
+    return nn1.kneighbors(new)
 
 def model_step_two(clicked):
 
-    return f"""based on your request we think you'll enjoy the following song suggestions: n/
-    {nn2.kneighbors(clicked)}"""
+    return nn2.kneighbors(clicked)
 
 
 
