@@ -1,77 +1,106 @@
-from sklearn.decomposition import PCA
-from sklearn.neighbors import NearestNeighbors
 import pandas as pd
 import numpy as np
-# !python -m spacy download en_core_web_sm
 import spacy
+from sklearn.decomposition import PCA
+from sklearn.neighbors import NearestNeighbors
+
 nlp = spacy.load('en_core_web_sm')
 
-<<<<<<< HEAD
-    ## All your model
-    ['song1', 'song2']
-    return song_list
-=======
-#steps to do:
-# train the model here
-# create a class for user input
-# run user input through model_1
-# run user input through model_2
+df = pd.read_csv('Spotify/data.csv')
+df = df[:20]
+df['artists'] = df['artists'].apply(lambda x: x[1:-1].replace("'", ''))
 
+df_slim = df.drop(['id', 'release_date', 'year', 'mode', 'key'], axis=1)
 
-### model training ###
-#STEP 1:
+def standardizer(data):
+  d_maxes = data.max()
+  d_mins = data.min()
+  data/d_maxes
+  return d_maxes, d_mins
 
-def get_word_vectors(song_name):
+df_slim['duration_ms'] = df_slim['duration_ms']/5403500
+df_slim['popularity'] = df_slim['popularity']/100
+df_slim['tempo'] = df_slim['tempo']/244.091
+df_slim['loudness'] = abs(df_slim['loudness']/60)
+
+ndf_slim = df_slim[:2000]
+
+def get_word_vectors(w):
   #converts of words to their own vectors
   return [nlp(word).vector for word in w]
 
-#STEP 2: train a NN model for just the song names
-names= ds['name']
-    # Vectorize the song names in the dataset
-s1_PCA_song_names = PCA(n_components=2)
-s1_PCA_song_names.fit(get_word_vectors(names))
-s1_name_vect = s1_PCA_song_names.transform(get_word_vectors(names))
+df_name=ndf_slim['name']
 
-#THESE next steps are for training the second model that analyzes all the features of the dataset
-#STEP 3: reduce artist and name columns to 1-D vector representations
+s1_PCA_song_names = PCA(n_components=2)
+
+s1_PCA_song_names.fit(get_word_vectors(df_name))
+
+s1_name_vect = s1_PCA_song_names.transform(get_word_vectors(df_name))
+
+nn1 = NearestNeighbors(n_neighbors=10, radius=0.5, algorithm='ball_tree', n_jobs=2)
+
+nn1.fit(s1_name_vect)
+
+names = ndf_slim['name']
+
 s2_PCA_song_names = PCA(n_components=1)
+
 s2_PCA_song_names.fit(get_word_vectors(names))
+
 name_vect = s2_PCA_song_names.transform(get_word_vectors(names))
-#
-artists = ds['artists']
+
+artists = ndf_slim['artists']
 PCA_artist_names = PCA(n_components=1)
+
 PCA_artist_names.fit(get_word_vectors(artists))
+
 artist_vect = PCA_artist_names.transform(get_word_vectors(artists))
 
-# step 4: remove the non-vectorized name and artist columns
 fdf= ndf_slim.drop(['name', 'artists'], axis=1)
 fdf['1d_vectorized_name'] = name_vect
 fdf['1d_vectorized_artist'] = artist_vect
-print(fdf.columns)
-print(fdf.shape)
-fdf.head()
 
-#step5: PCA the entire dataset now to reduce each obseration to just 2D vectors
 pca2 = PCA(n_components=2)
+
 pca2.fit(fdf)
+
 last_vector = pca2.transform(fdf)
 
-#step6: dataset ready for training the NN model
+names = ndf_slim['name']
+
 nn2 = NearestNeighbors(n_neighbors=10, radius=0.5, algorithm='ball_tree', n_jobs=2)
-nn2.fit(last_vector)
+X = last_vector
+nn2.fit(X)
 
+names = ndf_slim['name']
 
+def song_suggestion(song):
+    new_song = ([song])
+    new = get_word_vectors(new_song)
+    new = s1_PCA_song_names.transform(new)
 
-def model_step_1(song_name):
+    song_list = []
 
-    user_song = s1_PCA_song_names.transform(get_word_vectors(song_name))
-    return nn1.kneighbors(new)
+    for number in nn1.kneighbors(new)[1]:
+      song_list.append(df_name[number])
 
-def model_step_two(clicked):
+    temp = pd.DataFrame(song_list).values[0]
 
-    return nn2.kneighbors(clicked)
+    temp_list = []
+    for val in temp:
+      temp_list.append(val)
 
+    return temp_list
 
+def get_prediced_songs(user_song):
+ song_list = []
 
-   
->>>>>>> f54e1ea8eb1677b12e539b6095acd06dcc44dd2f
+ for number in nn2.kneighbors([X[7]])[1]:
+     song_list.append(df_name[number])
+
+ temp = pd.DataFrame(song_list).values[0]
+ temp_list = []
+ for val in temp:
+   temp_list.append(val)
+
+ return temp_list

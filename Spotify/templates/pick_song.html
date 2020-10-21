@@ -22,20 +22,11 @@
       <div>
         <tbody>
           {% for song in songs %}
-                <tr>
-                    <td>
-                      <button id="my-button-{{ song }}">{{ song }}</button>
-                      <form id="my-form-{{ song }}" method="POST" action="/song">
-                        <input name="song_name" value="{{ song }}">
-                      </form>
-                    </td>
-                </tr>
-                <script type=text/javascript>
-                  $("#my-button-{{ song }}").click(function(e) {
-                      $("#my-form-{{ song }}").submit();
-                  });
-                </script>
-            {% endfor %}
+            <form id="my-form-{{ song }}" method="POST" action="/song">
+              <input type="hidden" name="song_name" value="{{ song }}">
+              <input type="submit" value="Pick {{ song }}">
+            </form>
+          {% endfor %}
         </tbody>
       </div>
 

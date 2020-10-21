@@ -2,11 +2,12 @@
 
 from flask import Flask, render_template, request, Markup
 from Spotify.models import Song, DB
-from Spotify import model_output
+from Spotify import utility
 from os import getenv
 from Spotify import spotify_service
 import pandas as pd
 import numpy as np
+from Spotify import seans_model
 
 
 ## initalizing the app
@@ -31,8 +32,8 @@ def create_app():
     @app.route('/get_song_list', methods=['POST'])
     @app.route('/get_song_list')
     def get_song_list():
-        dummy_song_list = ['cats', request.values['song_name'], 'song3']
-        return render_template("pick_song.html", songs=dummy_song_list)
+        song_list = seans_model.song_suggestion(request.values['song_name'])
+        return render_template("pick_song.html", songs=song_list)
 
 
     ## Send output for model
@@ -40,10 +41,10 @@ def create_app():
     def song_suggestor():
         #df = pd.read_csv('Spotify/data.csv')
         #df = wrangle.wrangle(df)
+        song_list = seans_model.get_prediced_songs(request.values['song_name'])
 
-        df = model_output.return_model_output()
-
-        picked_song = model_output.get_user_input_song()
+        df = utility.get_song_by_name(song_list)
+        picked_song = utility.get_song_by_name([request.values['song_name']])
 
         # todo change request.values to model output values
         api_songs = spotify_service.test_query(request.values['song_name'])
