@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 nlp = spacy.load('en_core_web_sm')
 
 df = pd.read_csv('Spotify/data.csv')
-df = df[:5000]
+df = df[:5001]
 df['artists'] = df['artists'].apply(lambda x: x[1:-1].replace("'", ''))
 
 df_slim = df.drop(['id', 'release_date', 'year', 'mode', 'key'], axis=1)
