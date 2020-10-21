@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 nlp = spacy.load('en_core_web_sm')
 
 df = pd.read_csv('Spotify/data.csv')
-df = df[:20]
+df = df[:5000]
 df['artists'] = df['artists'].apply(lambda x: x[1:-1].replace("'", ''))
 
 df_slim = df.drop(['id', 'release_date', 'year', 'mode', 'key'], axis=1)
@@ -93,9 +93,10 @@ def song_suggestion(song):
     return temp_list
 
 def get_prediced_songs(user_song):
+ index = df[df['name'] == user_song].index[0]
  song_list = []
 
- for number in nn2.kneighbors([X[7]])[1]:
+ for number in nn2.kneighbors([X[index]])[1]:
      song_list.append(df_name[number])
 
  temp = pd.DataFrame(song_list).values[0]
