@@ -27,12 +27,23 @@ def create_app():
     def root():
         return render_template("base.html", title="Home")
 
+    # Get Seans songs
+    @app.route('/get_song_list', methods=['POST'])
+    @app.route('/get_song_list')
+    def get_song_list():
+        dummy_song_list = ['cats', request.values['song_name'], 'song3']
+        return render_template("pick_song.html", songs=dummy_song_list)
+
+
     ## Send output for model
     @app.route('/song', methods=['POST'])
     def song_suggestor():
+        #df = pd.read_csv('Spotify/data.csv')
+        #df = wrangle.wrangle(df)
+
         df = model_output.return_model_output()
 
-        original_song = model_output.get_user_input_song()
+        picked_song = model_output.get_user_input_song()
 
         # todo change request.values to model output values
         api_songs = spotify_service.test_query(request.values['song_name'])
@@ -41,11 +52,13 @@ def create_app():
         df2['popularity'] = df2['popularity'] / 100
         ss1 = df2.iloc[0].values
 
+        df2 = pd.concat([picked_song, df2]).reset_index(drop = True)
+
         max = df2.drop(columns=['name']).max().max()
         min = df2.drop(columns=['name']).min().min()
 
-        max = int(max) +1
-        min = int(min) -1
+        max = int(max) + 1
+        min = int(min) - 1
 
         max = np.max([max, abs(min)])
 
@@ -54,7 +67,7 @@ def create_app():
             max=max, min=min,
             labels=df2.columns,
             model_output=df2.to_dict(orient='records'),
-            original_song=original_song.values)
+            picked_song=picked_song.to_dict(orient='records'))
 
     @app.route('/test')
     def test():

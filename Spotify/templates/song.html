@@ -18,7 +18,13 @@
         <h1>Suggested Song</h1>
 
        {% for model_song in model_output %}
-       <p>Song : {{model_song.name}}</p>
+
+         {% if loop.first %}
+            <p>Picked Song : {{model_song.name}}</p>
+         {% else %}
+            <p>Song : {{model_song.name}}</p>
+         {% endif %}
+
 
        <canvas id="{{ loop.index }}" width="600" height="400"></canvas>
        <script>

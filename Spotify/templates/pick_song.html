@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Spotify Song song suggestor</title>
+    <link rel="stylesheet" href="https://unpkg.com/picnic" />
+  </head>
+
+  <body>
+    <nav>
+      <a href="/" class="brand"><span>Spotify Song Suggestor</span></a>
+
+      <!-- responsive-->
+      <input id="bmenub" type="checkbox" class="show">
+      <label for="bmenub" class="burger pseudo button">Menu</label>
+
+    </nav>
+
+    <article class="flex two" style="padding: 3em 1em;">
+      {% block content %}
+
+      <div>
+        <tbody>
+          {% for song in songs %}
+                <tr>
+                    <td>
+                      <button id="my-button-{{ song }}">{{ song }}</button>
+                      <form id="my-form-{{ song }}" method="POST" action="/song">
+                        <input name="song_name" value="{{ song }}">
+                      </form>
+                    </td>
+                </tr>
+                <script type=text/javascript>
+                  $("#my-button-{{ song }}").click(function(e) {
+                      $("#my-form-{{ song }}").submit();
+                  });
+                </script>
+            {% endfor %}
+        </tbody>
+      </div>
+
+      {% endblock %}
+    </article>
+  </body>
+</html>

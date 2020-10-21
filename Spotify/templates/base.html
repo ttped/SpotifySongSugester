@@ -4,6 +4,7 @@
   <head>
     <title>Spotify Song song_suggestor - {{ title }}</title>
     <link rel="stylesheet" href="https://unpkg.com/picnic" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   </head>
 
   <body>
@@ -20,10 +21,7 @@
       {% block content %}
       <div>
         <h2>List Of Songs</h2>
-        {% for song in songss %}
-        <a href="/song/{{ song.name }}"><span class="stack">{{ song.name }}</span></a>
-        {% endfor %}
-        <form action="/song" method="post">
+        <form action="/get_song_list" method="post">
           <input type="text" name="song_name" placeholder="Song to add">
           <input type="submit" value="Insert Song">
         </form>

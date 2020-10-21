@@ -25,4 +25,7 @@ def query(songnames):
       output_list.append(track['name'])
   return tuple(output_list)
 
+def spotify_suggestor(song):
+    results = sp.search(q=song, limit=30)
+
 #test_query("Sunfish")
