@@ -4,7 +4,7 @@ import spacy
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('my_model')
 
 df = pd.read_csv('Spotify/data.csv')
 df = df[:5001]
