@@ -1,1 +1,1 @@
-web: gunicorn shrouded-cove-87057:APP -t 120
+web: gunicorn spotify-ttped:APP -t 120
