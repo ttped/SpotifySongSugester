@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <title>Spotify Song song_suggestor - {{ title }}</title>
+    <title>Spotify Song Song Suggester - {{ title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/picnic" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link href="{{ url_for('static',filename='lib/fontawesome-free-5.15.1-web/css/all.css') }}" rel="stylesheet">
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
   </head>
 
   <body>
-    <nav>
-      <a href="/" class="brand"><span>Spotify Song Suggestor</span></a>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+          <a class="navbar-brand" href="/">Spotify Song Suggestor</a>
+          <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+              <ul class="navbar-nav flex-grow-1">
+                  <li class="nav-item">
+                      <a class="nav-link text-light" href="/">Home</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link text-light" href="https://github.com/Spotify0Song0Suggester/SpotifySongSugester">Github  &nbsp<i class="fab fa-github"></i></a>
+                  </li>
+              </ul>
+          </div>
     </nav>
-
-    <article class="flex two" style="padding: 3em 1em;">
-      {% block content %}
+    <div  style="padding-left: 10px;">
+    {% block content %}
       <div>
         <h1>Suggested Song</h1>
 
@@ -21,8 +32,10 @@
 
          {% if loop.first %}
             <p>Picked Song : {{model_song.name}}</p>
+            <p>Artist(s) : {{model_song.artists}}</p>
          {% else %}
             <p>Song : {{model_song.name}}</p>
+            <p>Artist(s) : {{model_song.artists}}</p>
          {% endif %}
 
 
@@ -31,57 +44,66 @@
          // bar chart data
          var barData = {
            labels : [
-             {% for item in labels if item != "name" %}
+             {% for item in labels if item != "artists" and item != "name"%}
               "{{ item }}",
              {% endfor %}
            ],
-
-           datasets : [{
-             fillColor: "rgba(151,187,205,0.2)",
-             strokeColor: "rgba(151,187,205,1)",
-             pointColor: "rgba(151,187,205,1)",
-             data : [
-             {% for key in model_song if key != "name" %}
-                "{{ model_song[key] }}",
-             {% endfor %}
-             ]
-            }]
+           datasets: [
+             {
+               label: 'Original Song',
+               data : [
+                 {% for key in model_output[0] if key != "name" and key != "artists"%}
+                    {{ model_output[0][key] }},
+                 {% endfor %}
+               ],
+               fillColor: "	rgb(255, 69, 0, .2)"
+             },
+             {
+               label: 'Suggested Song',
+               data : [
+                 {% for key in model_song if key != "name" and key != "artists"%}
+                    {{ model_song[key] }},
+                 {% endfor %}
+               ],
+               fillColor: "rgba(51, 102, 153,0.6)",
+               strokeColor: "rgba(51, 102, 153,1)",
+               pointColor: "rgba(51, 102, 153,1)",
+             }
+           ]
          }
 
-          steps = 10
           max = {{max}}
           min = {{min}}
 
         // draw bar chart
         new Chart(document.getElementById("{{ loop.index }}").getContext("2d")).Line(barData, {
-          scaleOverride: true,
-          scaleSteps: steps,
           scaleStepWidth: Math.ceil(max / 10),
-          scaleStartValue: min,
+          scaleStartValue: 0,
           scaleShowVerticalLines: true,
           scaleShowGridLines : true,
           barShowStroke : true,
           scaleShowLabels: true,
           options: {
-            title: {
-                display: true,
-                text: 'Custom Chart Title'
+            scales: {
+              yAxes: [{
+                stacked: true
+              }]
             }
           }
-          }
-        );
+        });
+
 
        </script>
        {% endfor %}
 
         <h1>Spotify API Songs</h1>
+
         {% for song in songs %}
-        <p>{{song}}</p>
+          <p>{{song}}</p>
         {% endfor %}
       </div>
-      {% endblock %}
-    </article>
+    </div>
+    {% endblock %}
     <!-- <script src="https://cdn.jsdelivr.net/npm/umbrellajs"/> -->
   </body>
-
 </html>

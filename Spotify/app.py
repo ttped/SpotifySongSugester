@@ -8,21 +8,23 @@ from Spotify import spotify_service
 import pandas as pd
 import numpy as np
 from Spotify import seans_model
+from flask_bootstrap import Bootstrap
 
 
 ## initalizing the app
 def create_app():
     """creates and configures flask application"""
 
+    app = Flask(__name__)
+    Bootstrap(app)
+    app.config['SQLAlCHEMY_DATABASE_URI'] = getenv('DATABASE_URI')
+    app.config['SQLAlCHEMY_TRACK_MODIFCATIONS'] = False
+    DB.init_app(app)
+
     colors = [
         "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
         "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
         "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
-
-    app = Flask(__name__)
-    app.config['SQLAlCHEMY_DATABASE_URI'] = getenv('DATABASE_URI')
-    app.config['SQLAlCHEMY_TRACK_MODIFCATIONS'] = False
-    DB.init_app(app)
 
     @app.route('/')
     def root():
@@ -49,17 +51,20 @@ def create_app():
         # todo change request.values to model output values
         api_songs = spotify_service.test_query(request.values['song_name'])
 
-        df2 = df.drop(columns=['artists'])
+        df2 = pd.concat([picked_song, df]).reset_index(drop = True)
         df2['popularity'] = df2['popularity'] / 100
-        ss1 = df2.iloc[0].values
 
-        df2 = pd.concat([picked_song, df2]).reset_index(drop = True)
+        # Normalize
+        for column in df2:
+            if df2[column].dtype == np.number:
+                df2[column] = (df2[column] - df2[column].min()) / (df2[column].max() - df2[column].min())
 
-        max = df2.drop(columns=['name']).max().max()
-        min = df2.drop(columns=['name']).min().min()
+        max = df2.drop(columns=['name', 'artists']).max().max()
+        min = df2.drop(columns=['name', 'artists']).min().min()
 
-        max = int(max) + 1
-        min = int(min) - 1
+        buffer = 1
+        max = int(max) + buffer
+        min = int(min) - buffer
 
         max = np.max([max, abs(min)])
 

@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <title>Spotify Song song_suggestor - {{ title }}</title>
+    <title>Spotify Song Song Suggester - {{ title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/picnic" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link href="{{ url_for('static',filename='lib/fontawesome-free-5.15.1-web/css/all.css') }}" rel="stylesheet">
   </head>
 
   <body>
-    <nav>
-      <a href="/" class="brand"><span>Spotify Song Suggestor</span></a>
-
-      <!-- responsive-->
-      <input id="bmenub" type="checkbox" class="show">
-      <label for="bmenub" class="burger pseudo button">Menu</label>
-
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+          <a class="navbar-brand" href="/">Spotify Song Suggestor</a>
+          <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+              <ul class="navbar-nav flex-grow-1">
+                  <li class="nav-item">
+                      <a class="nav-link text-light" href="/">Home</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link text-light" href="https://github.com/Spotify0Song0Suggester/SpotifySongSugester">Github  &nbsp<i class="fab fa-github"></i></a>
+                  </li>
+              </ul>
+          </div>
     </nav>
 
     <article class="flex two" style="padding: 3em 1em;">
       {% block content %}
       <div>
-        <h2>List Of Songs</h2>
+        <h2>Pick A Song For Suggestions</h2>
         <form action="/get_song_list" method="post">
           <input type="text" name="song_name" placeholder="Song to add">
           <input type="submit" value="Insert Song">

@@ -18,6 +18,7 @@ sklearn = "*"
 category-encoders = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
+flask-bootstrap = "*"
 
 [requires]
 python_version = "3.8"
